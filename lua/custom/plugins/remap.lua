@@ -33,9 +33,7 @@ vim.keymap.set('n', 'Q', '<nop>')
 
 -- Switch projects with CTRL + f
 vim.keymap.set('n', '<C-f>', '<cmd>silent !tmux neww tmux-sessionizer<CR>')
-vim.keymap.set('n', '<leader>f', function()
-  vim.lsp.buf.format()
-end)
+-- Note: <leader>f formatting is handled by conform.nvim in init.lua
 
 -- Quick fix navigation
 --vim.keymap.set('n', '<C-k>', '<cmd>cnext<CR>zz')
