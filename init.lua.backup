@@ -520,7 +520,7 @@ require('lazy').setup({
         -- Some languages (like typescript) have entire language plugins that can be useful:
         --    https://github.com/pmizio/typescript-tools.nvim
         --
-        ts_ls = {},
+        tsserver = {},
         eslint = {},
         rust_analyzer = {},
         --
@@ -590,8 +590,16 @@ require('lazy').setup({
     },
     opts = {
       notify_on_error = false,
-      -- format_on_save disabled for monorepo compatibility
-      -- Use <leader>f to format manually when needed
+      format_on_save = function(bufnr)
+        -- Disable "format_on_save lsp_fallback" for languages that don't
+        -- have a well standardized coding style. You can add additional
+        -- languages here or re-enable it for the disabled ones.
+        local disable_filetypes = { c = true, cpp = true }
+        return {
+          timeout_ms = 500,
+          lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
+        }
+      end,
       formatters_by_ft = {
         lua = { 'stylua' },
         javascript = { { 'prettierd', 'prettier' } },
@@ -813,10 +821,7 @@ require('lazy').setup({
       -- Prefer git instead of curl in order to improve connectivity in some environments
       require('nvim-treesitter.install').prefer_git = true
       ---@diagnostic disable-next-line: missing-fields
-      local ok, configs = pcall(require, 'nvim-treesitter.configs')
-      if ok then
-        configs.setup(opts)
-      end
+      require('nvim-treesitter.configs').setup(opts)
 
       -- There are additional nvim-treesitter modules that you can use to interact
       -- with nvim-treesitter. You should go explore a few and see what interests you:
@@ -845,25 +850,13 @@ require('lazy').setup({
   -- Added by me
   --
   -- AST viewer
-  -- Disabled due to compatibility issues with current treesitter version
-  -- {
-  --   'nvim-treesitter/playground',
-  --   dependencies = { 'nvim-treesitter/nvim-treesitter' },
-  --   config = function()
-  --     require('playground').setup()
-  --   end,
-  -- },
+  { 'nvim-treesitter/playground' },
   -- Jump between active files
   { 'theprimeagen/harpoon' },
   -- View undo tree
   { 'mbbill/undotree' },
   -- Git wrapper
   { 'tpope/vim-fugitive' },
-  -- Git diff viewer
-  {
-    'sindrets/diffview.nvim',
-    dependencies = { 'nvim-lua/plenary.nvim' },
-  },
 
   --[[File tree telescope plugin
   {
