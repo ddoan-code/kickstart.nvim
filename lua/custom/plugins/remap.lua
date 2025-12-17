@@ -1,49 +1,32 @@
--- Jump to netrw
-vim.keymap.set('n', '<leader>pv', vim.cmd.Ex)
+local map = vim.keymap.set
+local opts = { noremap = true, silent = true }
 
--- Move highlighted lines in visual mode with J and K
-vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
-vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv")
+-- Utility
+map('n', '<leader>h', ':nohlsearch<CR>', opts)
+map('n', '<C-c>', '<Esc>', opts)
 
--- Keep cursor position when appending line below with J
-vim.keymap.set('n', 'J', 'mzJ`z')
+-- Move lines up and down with Alt + j/k (visual mode)
+map('v', '<A-j>', ':m .+1<CR>==', opts)
+map('v', '<A-k>', ':m .-2<CR>==', opts)
 
--- Keep cursor in middle when jumping up and down with ctrl u/d
-vim.keymap.set('n', '<C-d>', '<C-d>zz')
-vim.keymap.set('n', '<C-u>', '<C-u>zz')
+-- Yank to clipboard
+map('n', 'Y', '"+y$', opts)
+map('v', 'Y', '"+y', opts)
 
--- Keep search term in middle when searching
-vim.keymap.set('n', 'n', 'nzzzv')
-vim.keymap.set('n', 'N', 'Nzzzv')
-
--- Keep buffer when pasting in visual mode
-vim.keymap.set('x', '<leader>p', '"_dP')
-
--- Yank to system clipboard with leader y
-vim.keymap.set('n', '<leader>y', '"+y')
-vim.keymap.set('v', '<leader>y', '"+y')
-vim.keymap.set('n', '<leader>Y', '"+Y')
-
--- Delete to void (clash atm)
---vim.keymap.set('n', '<leader>d', '"_d')
---vim.keymap.set('v', '<leader>d', '"_d')
-
--- Disable Q
-vim.keymap.set('n', 'Q', '<nop>')
-
--- Switch projects with CTRL + f
-vim.keymap.set('n', '<C-f>', '<cmd>silent !tmux neww tmux-sessionizer<CR>')
--- Note: <leader>f formatting is handled by conform.nvim in init.lua
-
--- Quick fix navigation
---vim.keymap.set('n', '<C-k>', '<cmd>cnext<CR>zz')
---vim.keymap.set('n', '<C-j>', '<cmd>cprev<CR>zz')
---vim.keymap.set('n', '<leader>k', '<cmd>lnext<CR>zz')
---vim.keymap.set('n', '<leader>j', '<cmd>lprev<CR>zz')
-
+-- Search and replace
 -- Replace highlighted word with leader s
-vim.keymap.set('n', '<leader>s', [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
+map('n', '<leader>s', [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
+
 -- chmod +x without having to go do command line
-vim.keymap.set('n', '<leader>x', '<cmd>!chmod +x %<CR>', { silent = true })
+map('n', '<leader>x', '<cmd>!chmod +x %<CR>', { silent = true })
+
+-- Comment current line with CMD + /
+map('n', '<D-/>', function()
+  require('Comment.api').toggle.linewise.current()
+end, { noremap = true, silent = true, desc = 'Toggle comment (CMD+/)' })
+
+map('v', '<D-/>', function()
+  require('Comment.api').toggle.linewise(vim.fn.visualmode())
+end, { noremap = true, silent = true, desc = 'Toggle comment (CMD+/)' })
 
 return {}
